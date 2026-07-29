@@ -1,0 +1,4 @@
+[
+  {"analyte": "Assay", "method": "HPLC", "result": 99.0, "unit": "%", "batch_id": "B-009", "date": "2026-05-02", "source_ref": {"document_id": "CoA-B009", "page": 1}},
+  {"analyte": "Water Content", "method": "KF", "result": 3.0, "unit": "%", "batch_id": "B-009", "date": "2026-05-02", "source_ref": {"document_id": "CoA-B009", "page": 1}}
+]

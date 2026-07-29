@@ -1,0 +1,108 @@
+[
+  {
+    "ctd_section": "3.2.P.5.1",
+    "claim_type": "quantitative",
+    "analyte": "Assay",
+    "batch_id": "B-001",
+    "quantitative_value": 99.2,
+    "text_span": "The assay result for batch B-001 was 99.2%."
+  },
+  {
+    "ctd_section": "3.2.P.5.4",
+    "claim_type": "quantitative",
+    "analyte": "Related Substances - Total",
+    "batch_id": "B-001",
+    "quantitative_value": 0.23,
+    "text_span": "Total related substances for batch B-001 were 0.23%."
+  },
+  {
+    "ctd_section": "3.2.P.5.4",
+    "claim_type": "quantitative",
+    "analyte": "Water Content",
+    "batch_id": "B-001",
+    "quantitative_value": 3.1,
+    "text_span": "Water content for batch B-001 was 3.1%."
+  },
+  {
+    "ctd_section": "3.2.P.5.1",
+    "claim_type": "quantitative",
+    "analyte": "Assay",
+    "batch_id": "B-002",
+    "quantitative_value": 93.5,
+    "text_span": "The assay result for batch B-002 was 93.5%."
+  },
+  {
+    "ctd_section": "3.2.P.5.5",
+    "claim_type": "quantitative",
+    "analyte": "Dissolution",
+    "batch_id": "B-001",
+    "quantitative_value": 97.0,
+    "text_span": "Dissolution for batch B-001 was 97.0% at 30 minutes."
+  },
+  {
+    "ctd_section": "3.2.P.5.4",
+    "claim_type": "quantitative",
+    "analyte": "Related Substances - Total",
+    "batch_id": "B-005",
+    "quantitative_value": 0.6,
+    "qualifier": ">",
+    "text_span": "Total related substances for batch B-005 were >0.6%."
+  },
+  {
+    "ctd_section": "3.2.P.5.1",
+    "claim_type": "quantitative",
+    "analyte": "Assay",
+    "batch_id": "B-005",
+    "result_text": "ND",
+    "text_span": "The assay result for batch B-005 was not detected (ND)."
+  },
+  {
+    "ctd_section": "3.2.P.5.4",
+    "claim_type": "quantitative",
+    "analyte": "Water Content",
+    "batch_id": "B-006",
+    "quantitative_value": 2.5,
+    "qualifier": "<",
+    "text_span": "Water content for batch B-006 was <2.5%."
+  },
+  {
+    "ctd_section": "3.2.P.5.4",
+    "claim_type": "quantitative",
+    "analyte": "Any Unspecified Impurity",
+    "batch_id": "B-006",
+    "result_text": "ND",
+    "text_span": "Any unspecified impurity for batch B-006 was not detected (ND)."
+  },
+  {
+    "ctd_section": "3.2.P.5.4",
+    "claim_type": "quantitative",
+    "analyte": "Assay",
+    "batch_id": "B-009",
+    "quantitative_value": 99.0,
+    "text_span": "Batch Analyses (3.2.P.5.4): assay for batch B-009 was 99.0%."
+  },
+  {
+    "ctd_section": "3.2.P.2.3",
+    "claim_type": "quantitative",
+    "analyte": "Assay",
+    "batch_id": "B-009",
+    "quantitative_value": 97.5,
+    "text_span": "Development summary (3.2.P.2.3): assay for batch B-009 reported as 97.5%."
+  },
+  {
+    "ctd_section": "3.2.P.5.4",
+    "claim_type": "quantitative",
+    "analyte": "Water Content",
+    "batch_id": "B-009",
+    "quantitative_value": 3.0,
+    "text_span": "Batch Analyses (3.2.P.5.4): water content for batch B-009 was 3.0%."
+  },
+  {
+    "ctd_section": "3.2.P.2.3",
+    "claim_type": "quantitative",
+    "analyte": "Water Content",
+    "batch_id": "B-009",
+    "quantitative_value": 3.0,
+    "text_span": "Development summary (3.2.P.2.3): water content for batch B-009 was 3.0%."
+  }
+]

@@ -1,0 +1,4 @@
+[
+  {"analyte": "Related Substances - Total", "method": "HPLC", "result": 0.6, "qualifier": ">", "unit": "%", "batch_id": "B-005", "date": "2026-03-01", "source_ref": {"document_id": "CoA-B005", "page": 1}},
+  {"analyte": "Assay", "method": "HPLC", "result_text": "ND", "batch_id": "B-005", "date": "2026-03-01", "source_ref": {"document_id": "CoA-B005", "page": 1}}
+]

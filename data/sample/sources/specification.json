@@ -1,0 +1,5 @@
+[
+  {"analyte": "Assay", "spec_limit": "95.0-105.0", "unit": "%", "source_ref": {"document_id": "SPEC-DP-01", "page": 1}},
+  {"analyte": "Related Substances - Total", "spec_limit": "NMT 0.5", "unit": "%", "source_ref": {"document_id": "SPEC-DP-01", "page": 1}},
+  {"analyte": "Water Content", "spec_limit": "NMT 4.0", "unit": "%", "source_ref": {"document_id": "SPEC-DP-01", "page": 1}}
+]

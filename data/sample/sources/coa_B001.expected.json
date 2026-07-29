@@ -1,0 +1,5 @@
+[
+  {"analyte": "Assay", "method": "HPLC", "result": 99.2, "unit": "%", "batch_id": "B-001", "date": "15-Jan-2026"},
+  {"analyte": "Related Substances - Total", "method": "HPLC", "result": 0.32, "unit": "%", "batch_id": "B-001", "date": "15-Jan-2026"},
+  {"analyte": "Water Content", "method": "KF", "result": 3.1, "unit": "%", "batch_id": "B-001", "date": "15-Jan-2026"}
+]

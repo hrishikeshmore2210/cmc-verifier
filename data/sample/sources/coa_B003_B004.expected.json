@@ -1,0 +1,8 @@
+[
+  {"analyte": "Assay", "method": "HPLC", "result": 101.4, "qualifier": null, "result_text": null, "unit": "%", "batch_id": "B-003"},
+  {"analyte": "Related Substances - Total", "method": "HPLC", "result": 0.05, "qualifier": "<", "result_text": null, "unit": "%", "batch_id": "B-003"},
+  {"analyte": "Any Unspecified Impurity", "method": "HPLC", "result": null, "qualifier": null, "result_text": "ND", "unit": null, "batch_id": "B-003"},
+  {"analyte": "Water Content", "method": "KF", "result": 2.8, "qualifier": null, "result_text": null, "unit": "%", "batch_id": "B-003"},
+  {"analyte": "Assay", "method": "HPLC", "result": 98.7, "qualifier": null, "result_text": null, "unit": "%", "batch_id": "B-004"},
+  {"analyte": "Water Content", "method": "KF", "result": 3.4, "qualifier": null, "result_text": null, "unit": "%", "batch_id": "B-004"}
+]

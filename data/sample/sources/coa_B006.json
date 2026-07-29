@@ -1,0 +1,4 @@
+[
+  {"analyte": "Water Content", "method": "KF", "result": 2.5, "unit": "%", "batch_id": "B-006", "date": "2026-03-15", "source_ref": {"document_id": "CoA-B006", "page": 1}},
+  {"analyte": "Any Unspecified Impurity", "method": "HPLC", "result": 0.03, "unit": "%", "batch_id": "B-006", "date": "2026-03-15", "source_ref": {"document_id": "CoA-B006", "page": 1}}
+]

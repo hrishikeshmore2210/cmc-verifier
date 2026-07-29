@@ -1,0 +1,5 @@
+[
+  {"analyte": "Assay", "method": "HPLC", "result": 98.9, "qualifier": null, "result_text": null, "unit": "%", "batch_id": "B-008"},
+  {"analyte": "Related Substances - Total", "method": "HPLC", "result": 0.41, "qualifier": null, "result_text": null, "unit": "%", "batch_id": "B-008"},
+  {"analyte": "Water Content", "method": "KF", "result": 3.5, "qualifier": null, "result_text": null, "unit": "%", "batch_id": "B-008"}
+]
