@@ -6,3 +6,5 @@ venv/
 .pytest_cache/
 .langgraph_api/
 /report.html
+
+/audit_log.jsonl
