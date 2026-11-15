@@ -9,7 +9,11 @@ Later: false-positive suppression, confidence calibration, cross-check dedupe.
 
 from __future__ import annotations
 
+import logging
+
 from ..models import Severity, VerificationState
+
+log = logging.getLogger(__name__)
 
 
 def critic(state: VerificationState) -> VerificationState:
@@ -23,8 +27,7 @@ def critic(state: VerificationState) -> VerificationState:
         seen.add(key)
         adjudicated.append(f)
 
-    print(f"[critic] adjudicating {len(raw)} raw flag(s) -> {len(adjudicated)} unique")
-
+    log.info(f"adjudicating {len(raw)} raw flag(s) -> {len(adjudicated)} unique")
     report = {
         "total_flags": len(adjudicated),
         "by_severity": {

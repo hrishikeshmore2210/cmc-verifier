@@ -13,12 +13,17 @@ The remaining four are stubs until their turn in the roadmap.
 
 from __future__ import annotations
 
+import logging
+
 import re
 from typing import Callable, Optional
 
+from ..config import get_settings
 from ..models import Flag, Severity, VerificationState
 
-NUMERIC_TOLERANCE = 0.01  # absolute; tighten/units-aware later
+log = logging.getLogger(__name__)
+
+NUMERIC_TOLERANCE = 0.01  # default; override with CMC_NUMERIC_TOLERANCE (see config.py)
 
 
 # ---- helpers ---------------------------------------------------------------
@@ -94,13 +99,15 @@ def evaluate_against_spec(value, qualifier, result_text, low, high):
 
 # ---- implemented checks ----------------------------------------------------
 
-def reconcile_measurement(claim, fact, tol=NUMERIC_TOLERANCE):
+def reconcile_measurement(claim, fact, tol=None):
     """Compare a dossier claim measurement to a source fact measurement.
 
     Returns None if they agree, else a human-readable mismatch reason. Handles
     three kinds of disagreement: value, qualifier ("<"/">"), and result type
     (numeric vs non-numeric like "ND").
     """
+    if tol is None:
+        tol = get_settings().numeric_tolerance
     unit = fact.unit or ""
 
     def fmt(value, qualifier, result_text):
@@ -130,7 +137,7 @@ def reconcile_measurement(claim, fact, tol=NUMERIC_TOLERANCE):
 
 
 def check_numerical_reconciliation(state: VerificationState) -> VerificationState:
-    print("[check:numerical_reconciliation] running")
+    log.info("check %s running", "numerical_reconciliation")
     flags: list[Flag] = []
     for link in state.get("links", []):
         c, rf = link["claim"], link["result_fact"]
@@ -182,7 +189,7 @@ def _flag_source_masked_by_claim(flags, claim, result_fact, spec_fact, low, high
 
 
 def check_spec_vs_result(state: VerificationState) -> VerificationState:
-    print("[check:spec_vs_result] running")
+    log.info("check %s running", "spec_vs_result")
     flags: list[Flag] = []
     for link in state.get("links", []):
         c, sf = link["claim"], link["spec_fact"]
@@ -225,7 +232,7 @@ def check_spec_vs_result(state: VerificationState) -> VerificationState:
 
 
 def check_traceability(state: VerificationState) -> VerificationState:
-    print("[check:traceability] running")
+    log.info("check %s running", "traceability")
     flags: list[Flag] = []
     for link in state.get("links", []):
         c, rf = link["claim"], link["result_fact"]
@@ -251,7 +258,7 @@ def _measurement_str(c):
 
 
 def check_cross_section_consistency(state: VerificationState) -> VerificationState:
-    print("[check:cross_section_consistency] running")
+    log.info("check %s running", "cross_section_consistency")
     flags: list[Flag] = []
     groups: dict = {}
     for c in state.get("claims", []):
@@ -290,7 +297,7 @@ def _norm_unit(u):
 
 def check_unit_nomenclature(state: VerificationState) -> VerificationState:
     """Unit agreement between a result and its spec, and controlled-vocabulary analyte names."""
-    print("[check:unit_nomenclature] running")
+    log.info("check %s running", "unit_nomenclature")
     from ..adapters import canonical_analyte
     flags: list[Flag] = []
     for link in state.get("links", []):
@@ -323,7 +330,7 @@ REQUIRED_CTD_SECTIONS = ("3.2.P.5.1", "3.2.P.5.4")
 
 def check_completeness_ctd(state: VerificationState) -> VerificationState:
     """Required sections present, and every batch with source results is reported."""
-    print("[check:completeness_ctd] running")
+    log.info("check %s running", "completeness_ctd")
     flags: list[Flag] = []
     claims = state.get("claims", [])
     present = {c.ctd_section for c in claims}
@@ -359,7 +366,7 @@ def check_completeness_ctd(state: VerificationState) -> VerificationState:
 
 def _noop(check_name: str) -> Callable[[VerificationState], VerificationState]:
     def _check(state: VerificationState) -> VerificationState:
-        print(f"[check:{check_name}] running (stub)")
+        log.info("check %s running (stub)", check_name)
         return {"flags": []}
     _check.__name__ = check_name
     return _check

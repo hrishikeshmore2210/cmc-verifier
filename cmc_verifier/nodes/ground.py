@@ -13,10 +13,14 @@ Each link = {"claim": Claim, "result_fact": SourceFact|None, "spec_fact": Source
 
 from __future__ import annotations
 
+import logging
+
 import re
 
 from ..adapters import canonical_analyte
 from ..models import Flag, Severity, VerificationState
+
+log = logging.getLogger(__name__)
 
 
 def _akey(analyte):
@@ -88,5 +92,5 @@ def ground(state: VerificationState) -> VerificationState:
         links.append({"claim": c, "result_fact": rf, "spec_fact": sf})
 
     grounded = sum(1 for l in links if l["result_fact"] is not None)
-    print(f"[ground] linked {grounded}/{len(links)} claim(s) to a source result")
+    log.info(f"linked {grounded}/{len(links)} claim(s) to a source result")
     return {"links": links, "flags": flags}

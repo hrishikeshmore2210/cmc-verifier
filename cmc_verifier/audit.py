@@ -164,8 +164,22 @@ class AuditLog:
             "confidence": flag.confidence,
         })
 
+    def decision_recorded(self, decision: dict):
+        """A human adjudication of one flag (accept / dismiss / needs_info)."""
+        return self._emit("decision_recorded", {
+            "flag_id": decision["flag_id"],
+            "decision": decision["decision"],
+            "reviewer": decision["reviewer"],
+            "note": decision.get("note", ""),
+            "decided_at": decision.get("ts"),
+        })
+
     def run_completed(self, report):
         return self._emit("run_completed", {"report": report})
+
+    def run_failed(self, error: str):
+        """Terminal event for a run that crashed, so the ledger never just goes silent."""
+        return self._emit("run_failed", {"error": error})
 
 
 def verify_audit_log(path):
@@ -199,8 +213,8 @@ def verify_audit_log(path):
             problems.append(f"line {i} (seq {rec.get('seq')}): missing or invalid HMAC signature")
         prev = rec.get("hash")
         last_event = rec.get("event")
-    if lines and last_event != "run_completed":
-        problems.append("log does not end with run_completed — possible truncation or an interrupted run")
+    if lines and last_event not in ("run_completed", "run_failed"):
+        problems.append("log does not end with run_completed/run_failed — possible truncation or an interrupted run")
     return (len(problems) == 0, problems)
 
 

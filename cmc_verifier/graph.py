@@ -23,7 +23,9 @@ from .nodes.review import human_review
 from .nodes.safety import isolate
 
 
-def build_graph():
+def build_graph(interactive: bool = False):
+    """interactive=True compiles with a checkpointer and pauses BEFORE human_review so a
+    person can record decisions (see review.py) and then resume with invoke(None, config)."""
     g = StateGraph(VerificationState)
 
     # spine
@@ -51,9 +53,7 @@ def build_graph():
     g.add_edge("critic", "human_review")
     g.add_edge("human_review", END)
 
-    # To enable a REAL human interrupt (ARCHITECTURE.md §4/§5), compile with a
-    # checkpointer instead:
-    #   from langgraph.checkpoint.memory import MemorySaver
-    #   return g.compile(checkpointer=MemorySaver(),
-    #                    interrupt_before=["human_review"])
+    if interactive:
+        from langgraph.checkpoint.memory import InMemorySaver
+        return g.compile(checkpointer=InMemorySaver(), interrupt_before=["human_review"])
     return g.compile()

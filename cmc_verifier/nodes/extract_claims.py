@@ -7,15 +7,19 @@ later step; the output contract (list[Claim]) does not change.
 
 from __future__ import annotations
 
+import logging
+
 import json
 from pathlib import Path
 
 from ..models import Claim, VerificationState
+
+log = logging.getLogger(__name__)
 
 
 def extract_claims(state: VerificationState) -> VerificationState:
     dossier_path = state["dossier_path"]
     rows = json.loads(Path(dossier_path).read_text(encoding="utf-8-sig"))
     claims = [Claim(**row) for row in rows]
-    print(f"[extract_claims] parsed {len(claims)} claim(s) from {dossier_path}")
+    log.info(f"parsed {len(claims)} claim(s) from {dossier_path}")
     return {"claims": claims}

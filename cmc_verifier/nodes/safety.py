@@ -7,10 +7,14 @@ reviewer sees "this check did not run" rather than a crash or, worse, silence.
 
 from __future__ import annotations
 
+import logging
+
 import functools
 from typing import Callable
 
 from ..models import Flag, Severity
+
+log = logging.getLogger(__name__)
 
 
 def isolate(name: str, fn: Callable) -> Callable:
@@ -19,7 +23,7 @@ def isolate(name: str, fn: Callable) -> Callable:
         try:
             return fn(state)
         except Exception as exc:  # noqa: BLE001 - deliberate catch-all boundary
-            print(f"[check:{name}] FAILED: {type(exc).__name__}: {exc}")
+            log.error("check %s FAILED: %s: %s", name, type(exc).__name__, exc)
             return {"flags": [Flag(
                 check_name=name,
                 severity=Severity.MAJOR,

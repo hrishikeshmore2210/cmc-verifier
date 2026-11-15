@@ -78,3 +78,4 @@ class VerificationState(TypedDict, total=False):
     flags: Annotated[list[Flag], operator.add]   # written by: check_* (parallel)
     adjudicated_flags: list[Flag]          # written by: critic
     report: dict[str, Any]                 # written by: critic / review
+    decisions: list[dict[str, Any]]        # written by: the human reviewer (via update_state)

@@ -8,11 +8,15 @@ nothing else in the graph moves.
 
 from __future__ import annotations
 
+import logging
+
 import json
 from pathlib import Path
 
 from ..adapters import parse_coa_csv, parse_coa_pdf
 from ..models import Flag, Severity, SourceFact, VerificationState
+
+log = logging.getLogger(__name__)
 
 
 def _parse_json(path: Path) -> list[SourceFact]:
@@ -51,15 +55,14 @@ def ingest(state: VerificationState) -> VerificationState:
         try:
             parsed = adapter(path)
         except Exception as exc:  # noqa: BLE001 - one bad file must not sink the run
-            print(f"[ingest]   FAILED {path.name}: {type(exc).__name__}: {exc}")
+            log.error(f"FAILED {path.name}: {type(exc).__name__}: {exc}")
             flags.append(_ingest_flag(path, f"could not be parsed ({type(exc).__name__}: {exc})"))
             continue
         if not parsed:
             flags.append(_ingest_flag(path, "yielded no facts (empty, unrecognized layout, or scanned image)"))
         facts.extend(parsed)
-        print(f"[ingest]   {path.name}: {len(parsed)} fact(s) via {path.suffix} adapter")
-
+        log.info(f"{path.name}: {len(parsed)} fact(s) via {path.suffix} adapter")
     if skipped:
-        print(f"[ingest]   skipped (no adapter): {', '.join(skipped)}")
-    print(f"[ingest] loaded {len(facts)} source fact(s) total")
+        log.info(f"skipped (no adapter): {', '.join(skipped)}")
+    log.info(f"loaded {len(facts)} source fact(s) total")
     return {"source_facts": facts, "flags": flags}
