@@ -11,3 +11,6 @@ venv/
 .claude/settings.local.json
 graphify-out/
 *.jsonl.lock
+.hypothesis/
+.ruff_cache/
+*.egg-info/

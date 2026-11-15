@@ -25,7 +25,7 @@ from .exports import flags_to_json, flags_to_sarif, severity_rank
 from .logging_setup import configure_logging
 from .mcp_store import LocalDocumentStore
 from .nodes.checks import CHECKS
-from .nodes.review import Decision, flag_id, make_decision
+from .nodes.review import Decision, make_decision
 
 log = logging.getLogger(__name__)
 

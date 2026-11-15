@@ -73,13 +73,32 @@ The design deliberately separates **extraction** (get rows-and-cells out of a do
 - **Reproducible by construction.** Deterministic checks in code; the pipeline is currently fully deterministic (LLM-based extraction is on the roadmap).
 - **Eval-driven.** A golden dataset with injected errors and answer keys measures both extraction accuracy and check accuracy — every capability ships with its own proof.
 
+## Usage
+
+```bash
+pip install -e ".[dev]"
+python run.py                                   # sample data; exit 1 if any CRITICAL flag
+python run.py --fail-on major --sarif out.sarif --json out.json --report
+python run.py --dossier d.json --sources ./coas # your own data
+python run.py --review --reviewer alice         # pause; record accept/dismiss/needs-info per flag
+```
+
+Exit codes: `0` ok · `1` flags at/above `--fail-on` · `2` bad input · `3` internal error.
+Config via env: `CMC_NUMERIC_TOLERANCE`, `CMC_AUDIT_PATH`, `CMC_LOG_LEVEL`, `CMC_LOG_JSON=1`,
+`AUDIT_HMAC_KEY` (signs audit events). Verify a ledger: `python -m cmc_verifier.audit audit_log.jsonl`.
+
+Docker: `docker build -t cmc-verifier . && docker run --rm -v "$PWD:/work" cmc-verifier --dossier d.json --sources coas`
+(the image is untested locally; CI builds and smoke-tests it).
+
 ## Testing
 
 ```bash
-pytest -q
+pytest -q                       # unit, property (hypothesis), CLI, audit, review tests
+python -m cmc_verifier.evals    # per-check precision/recall vs data/sample/golden_flags.json
+ruff check .
 ```
 
-**85 tests**, covering the graph end-to-end, per-check verdict truth tables, and extraction accuracy. Extraction runs at **1.0 precision/recall** against the golden CoA fixtures (CSV, bordered PDF, and borderless PDF), and the graph asserts the exact set of 9 known discrepancies with no false positives on the clean claims.
+Covers the graph end-to-end, per-check verdict truth tables, parser round-trips and fuzzing, audit tamper/truncation/concurrency, and the human-review interrupt. Extraction runs at **1.0 precision/recall** against the golden CoA fixtures, and the eval harness gates CI on per-check precision/recall of the flags themselves.
 
 ## Tech
 
@@ -87,4 +106,4 @@ Python 3.10+ · [LangGraph](https://github.com/langchain-ai/langgraph) · Pydant
 
 ## Status & scope
 
-This is a working prototype built to demonstrate production-grade AI-engineering patterns for a regulated domain. It runs on **synthetic data** and is **not validated for production GxP use** — it's a design-partner and portfolio artifact, not a certified system. Known frontiers: scanned/image PDFs (no text layer, needs OCR), a real human-in-the-loop interrupt with a persisted audit trail, and the phase-2 authoring module described in the architecture doc.
+This is a working prototype built to demonstrate production-grade AI-engineering patterns for a regulated domain. It runs on **synthetic data** and is **not validated for production GxP use** — it's a design-partner and portfolio artifact, not a certified system. Known frontiers: scanned/image PDFs (no text layer, needs OCR), durable (non-in-memory) checkpointing for the review pause, the `stability_trend` check (needs a time-point field), multi-batch-per-page PDFs, LLM-based claim extraction, and the phase-2 authoring module described in the architecture doc.

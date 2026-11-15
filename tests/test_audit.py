@@ -2,7 +2,7 @@
 
 import json
 
-from cmc_verifier.audit import AuditLog, verify_audit_log
+from cmc_verifier.audit import AuditLog
 from cmc_verifier.models import Flag, Severity, SourceRef
 
 

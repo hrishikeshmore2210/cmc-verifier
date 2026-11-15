@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "reportlab>=4", "ruff>=0.5"]
+dev = ["pytest>=8", "hypothesis>=6", "reportlab>=4", "ruff>=0.5"]
 
 [project.scripts]
 cmc-verify = "cmc_verifier.cli:main"
@@ -25,3 +25,15 @@ include = ["cmc_verifier*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["graphify-out", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501", "B905"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E702", "E731"]

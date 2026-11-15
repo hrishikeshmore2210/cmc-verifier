@@ -7,9 +7,8 @@ later step; the output contract (list[Claim]) does not change.
 
 from __future__ import annotations
 
-import logging
-
 import json
+import logging
 from pathlib import Path
 
 from ..models import Claim, VerificationState

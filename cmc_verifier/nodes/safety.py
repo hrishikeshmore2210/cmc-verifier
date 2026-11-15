@@ -7,9 +7,8 @@ reviewer sees "this check did not run" rather than a crash or, worse, silence.
 
 from __future__ import annotations
 
-import logging
-
 import functools
+import logging
 from typing import Callable
 
 from ..models import Flag, Severity

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import operator
 from enum import Enum
-from typing import Literal, Annotated, Any, Optional, TypedDict
+from typing import Annotated, Any, Literal, Optional, TypedDict
 
 from pydantic import BaseModel, Field
 

@@ -8,9 +8,8 @@ nothing else in the graph moves.
 
 from __future__ import annotations
 
-import logging
-
 import json
+import logging
 from pathlib import Path
 
 from ..adapters import parse_coa_csv, parse_coa_pdf

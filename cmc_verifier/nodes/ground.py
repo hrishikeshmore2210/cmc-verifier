@@ -14,7 +14,6 @@ Each link = {"claim": Claim, "result_fact": SourceFact|None, "spec_fact": Source
 from __future__ import annotations
 
 import logging
-
 import re
 
 from ..adapters import canonical_analyte
@@ -91,6 +90,6 @@ def ground(state: VerificationState) -> VerificationState:
             ))
         links.append({"claim": c, "result_fact": rf, "spec_fact": sf})
 
-    grounded = sum(1 for l in links if l["result_fact"] is not None)
+    grounded = sum(1 for link in links if link["result_fact"] is not None)
     log.info(f"linked {grounded}/{len(links)} claim(s) to a source result")
     return {"links": links, "flags": flags}

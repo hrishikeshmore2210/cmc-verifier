@@ -1,0 +1,13 @@
+.git
+.venv
+.github
+__pycache__
+*.pyc
+.pytest_cache
+.hypothesis
+.ruff_cache
+graphify-out
+tests
+docs
+audit_log.jsonl
+report.html

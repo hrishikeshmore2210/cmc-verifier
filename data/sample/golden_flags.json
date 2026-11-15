@@ -1,0 +1,15 @@
+[
+  {"check": "numerical_reconciliation", "analyte": "Related Substances - Total", "batch": "B-001"},
+  {"check": "numerical_reconciliation", "analyte": "Water Content", "batch": "B-006"},
+  {"check": "numerical_reconciliation", "analyte": "Any Unspecified Impurity", "batch": "B-006"},
+  {"check": "numerical_reconciliation", "analyte": "Assay", "batch": "B-009"},
+  {"check": "spec_vs_result", "analyte": "Assay", "batch": "B-002"},
+  {"check": "spec_vs_result", "analyte": "Related Substances - Total", "batch": "B-005"},
+  {"check": "spec_vs_result", "analyte": "Assay", "batch": "B-005"},
+  {"check": "traceability", "analyte": "Dissolution", "batch": "B-001"},
+  {"check": "cross_section_consistency", "analyte": "Assay", "batch": "B-009"},
+  {"check": "completeness_ctd", "analyte": "*", "batch": "B-003"},
+  {"check": "completeness_ctd", "analyte": "*", "batch": "B-004"},
+  {"check": "completeness_ctd", "analyte": "*", "batch": "B-007"},
+  {"check": "completeness_ctd", "analyte": "*", "batch": "B-008"}
+]

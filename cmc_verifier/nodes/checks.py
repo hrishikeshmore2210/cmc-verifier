@@ -14,7 +14,6 @@ The remaining four are stubs until their turn in the roadmap.
 from __future__ import annotations
 
 import logging
-
 import re
 from typing import Callable, Optional
 
@@ -345,7 +344,9 @@ def check_completeness_ctd(state: VerificationState) -> VerificationState:
                 rationale="A required section appears to be missing or empty.",
             ))
     import re as _re
-    key = lambda b: _re.sub(r"[^a-z0-9]", "", b.lower()) if b else None
+    def key(b):
+        return _re.sub(r"[^a-z0-9]", "", b.lower()) if b else None
+
     claimed = {key(c.batch_id) for c in claims}
     reported = set()
     for f in state.get("source_facts", []):

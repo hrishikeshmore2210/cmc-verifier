@@ -130,11 +130,14 @@ def facts_from_rows(rows, document_id):
             continue
         key = cells[0].lower()
         if key == _PAGE_MARKER and len(cells) > 1 and cells[1].isdigit():
-            page = int(cells[1]); continue
+            page = int(cells[1])
+            continue
         if key in _BATCH_KEYS and len(cells) > 1 and cells[1]:
-            batch_id = cells[1]; continue
+            batch_id = cells[1]
+            continue
         if header is None and key in _DATE_KEYS and len(cells) > 1 and cells[1]:
-            date = cells[1]; continue
+            date = cells[1]
+            continue
         if header is None:
             if _REQUIRED_HEADERS.issubset({c.lower() for c in cells}):
                 header = [c.lower() for c in cells]

@@ -76,7 +76,7 @@ class _FileLock:
                 return self
             except FileExistsError:
                 if time.monotonic() > deadline:
-                    raise TimeoutError(f"could not acquire audit lock {self.lock_path}")
+                    raise TimeoutError(f"could not acquire audit lock {self.lock_path}") from None
                 time.sleep(0.05)
 
     def __exit__(self, *exc):
