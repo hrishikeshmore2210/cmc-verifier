@@ -148,8 +148,9 @@ class AuditLog:
     def ingested(self, fact_count, document_count):
         return self._emit("ingested", {"facts": fact_count, "documents": document_count})
 
-    def claims_extracted(self, claim_count):
-        return self._emit("claims_extracted", {"claims": claim_count})
+    def claims_extracted(self, claim_count, extraction=None):
+        """`extraction` carries LLM lineage (model, prompt_version, cache_hit, document hash, tokens)."""
+        return self._emit("claims_extracted", {"claims": claim_count, "extraction": extraction or {}})
 
     def flag_raised(self, flag):
         ref = flag.source_ref

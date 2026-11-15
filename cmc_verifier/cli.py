@@ -110,7 +110,7 @@ def main(argv=None, input_fn=input) -> int:
     flags = final.get("adjudicated_flags", [])
     report = final.get("report", {})
     audit.ingested(len(final.get("source_facts", [])), len(source_paths))
-    audit.claims_extracted(len(final.get("claims", [])))
+    audit.claims_extracted(len(final.get("claims", [])), final.get("extraction_meta"))
     for f in flags:
         audit.flag_raised(f)
     audit.run_completed(report)

@@ -74,6 +74,7 @@ class VerificationState(TypedDict, total=False):
     source_paths: list[str]
     source_facts: list[SourceFact]         # written by: ingest
     claims: list[Claim]                    # written by: extract_claims
+    extraction_meta: dict[str, Any]        # written by: extract_claims (method, model, cache hit, tokens)
     links: list[dict[str, Any]]            # written by: ground
     flags: Annotated[list[Flag], operator.add]   # written by: check_* (parallel)
     adjudicated_flags: list[Flag]          # written by: critic

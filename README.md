@@ -90,6 +90,29 @@ Config via env: `CMC_NUMERIC_TOLERANCE`, `CMC_AUDIT_PATH`, `CMC_LOG_LEVEL`, `CMC
 Docker: `docker build -t cmc-verifier . && docker run --rm -v "$PWD:/work" cmc-verifier --dossier d.json --sources coas`
 (the image is untested locally; CI builds and smoke-tests it).
 
+## LLM claim extraction (optional)
+
+Point `--dossier` at a narrative (`.txt` / `.md`) instead of structured JSON and claims are extracted by Claude:
+
+```bash
+pip install -e ".[llm]"            # adds the anthropic SDK
+export ANTHROPIC_API_KEY=...       # env var only; never written to disk or the audit log
+python run.py --dossier data/sample/dossier_narrative.txt
+```
+
+How it stays trustworthy (the model is treated as untrusted):
+
+- **Provenance gate:** every claim must carry an `evidence_quote` that appears *verbatim* in the document, and its value, qualifier, `ND`, analyte, batch and section must all be backed by the text. Anything else is rejected and surfaced as a flag, never silently dropped.
+- **Fails loudly:** a refusal, API error, truncated output or empty extraction yields a MAJOR flag and zero claims, so a broken extraction cannot look like a clean dossier.
+- **Prompt injection:** the document is delimited and declared data; the call has no tools; instruction-like phrases in the document raise a flag; and an injected claim still fails the verbatim check.
+- **Reproducible without `temperature=0`:** current Claude models reject sampling parameters, so determinism comes from an on-disk response cache keyed on (model, effort, prompt version, document). The audit ledger records model, prompt version, document SHA-256, cache hit, token counts and request id.
+- **Config:** `CMC_LLM_MODEL` (default `claude-opus-5-5`), `CMC_LLM_EFFORT` (default `high`), `CMC_LLM_CACHE_DIR`.
+
+Measure real quality (one billed call, ~$0.10 or less; refuses without the flag):
+`python -m cmc_verifier.llm.live_eval --yes-spend`. Offline tests use a fake client and never call the API.
+
+Not yet done: server-side refusal fallbacks, narrative PDFs (text/markdown only), streaming for very long outputs, and a measured run against the live API.
+
 ## Testing
 
 ```bash

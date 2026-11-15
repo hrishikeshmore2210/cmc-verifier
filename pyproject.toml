@@ -15,7 +15,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "hypothesis>=6", "reportlab>=4", "ruff>=0.5"]
+llm = ["anthropic>=2.8"]
+dev = ["anthropic>=2.8", "pytest>=8", "hypothesis>=6", "reportlab>=4", "ruff>=0.5"]
 
 [project.scripts]
 cmc-verify = "cmc_verifier.cli:main"

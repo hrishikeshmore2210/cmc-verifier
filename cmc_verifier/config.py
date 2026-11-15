@@ -4,6 +4,9 @@
     CMC_AUDIT_PATH          audit ledger path (default audit_log.jsonl)
     CMC_LOG_LEVEL           DEBUG|INFO|WARNING|ERROR (default INFO)
     CMC_LOG_JSON            "1" to emit one JSON object per log line
+    CMC_LLM_MODEL           model for narrative claim extraction (default claude-opus-5-5)
+    CMC_LLM_EFFORT          low|medium|high|xhigh|max (default high)
+    CMC_LLM_CACHE_DIR       response cache dir (default .cmc_cache/llm; "" disables)
     AUDIT_HMAC_KEY          see audit.py (read there, never logged)
 """
 
@@ -20,6 +23,9 @@ class Settings(BaseModel):
     audit_path: str = "audit_log.jsonl"
     log_level: str = "INFO"
     log_json: bool = False
+    llm_model: str = "claude-opus-5-5"
+    llm_effort: str = "high"
+    llm_cache_dir: str | None = ".cmc_cache/llm"
 
     @classmethod
     def from_env(cls, env=None) -> "Settings":
@@ -33,6 +39,12 @@ class Settings(BaseModel):
             kwargs["log_level"] = env["CMC_LOG_LEVEL"].upper()
         if "CMC_LOG_JSON" in env:
             kwargs["log_json"] = env["CMC_LOG_JSON"] == "1"
+        if "CMC_LLM_MODEL" in env:
+            kwargs["llm_model"] = env["CMC_LLM_MODEL"]
+        if "CMC_LLM_EFFORT" in env:
+            kwargs["llm_effort"] = env["CMC_LLM_EFFORT"]
+        if "CMC_LLM_CACHE_DIR" in env:
+            kwargs["llm_cache_dir"] = env["CMC_LLM_CACHE_DIR"] or None
         return cls(**kwargs)
 
 

@@ -1,0 +1,22 @@
+Module 3.2.P - Drug Product (synthetic sample narrative)
+
+3.2.P.2.3 Manufacturing Process Development
+Development summary (3.2.P.2.3): assay for batch B-009 reported as 97.5%.
+Development summary (3.2.P.2.3): water content for batch B-009 was 3.0%.
+
+3.2.P.5.1 Specification(s)
+The assay result for batch B-001 was 99.2%.
+The assay result for batch B-002 was 93.5%.
+The assay result for batch B-005 was not detected (ND).
+
+3.2.P.5.4 Batch Analyses
+Total related substances for batch B-001 were 0.23%.
+Water content for batch B-001 was 3.1%.
+Total related substances for batch B-005 were >0.6%.
+Water content for batch B-006 was <2.5%.
+Any unspecified impurity for batch B-006 was not detected (ND).
+Batch Analyses (3.2.P.5.4): assay for batch B-009 was 99.0%.
+Batch Analyses (3.2.P.5.4): water content for batch B-009 was 3.0%.
+
+3.2.P.5.5 Characterisation of Impurities
+Dissolution for batch B-001 was 97.0% at 30 minutes.

@@ -9,6 +9,9 @@ WORKDIR /app
 # Dependencies first for layer caching.
 COPY pyproject.toml requirements.txt ./
 RUN pip install -r requirements.txt
+# Optional LLM claim extraction: docker build --build-arg WITH_LLM=1 ...
+ARG WITH_LLM=0
+RUN if [ "$WITH_LLM" = "1" ]; then pip install "anthropic>=2.8"; fi
 
 COPY cmc_verifier ./cmc_verifier
 COPY data ./data
