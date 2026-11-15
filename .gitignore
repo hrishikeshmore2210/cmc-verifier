@@ -10,3 +10,4 @@ venv/
 /audit_log.jsonl
 .claude/settings.local.json
 graphify-out/
+*.jsonl.lock
