@@ -13,6 +13,7 @@ The remaining four are stubs until their turn in the roadmap.
 
 from __future__ import annotations
 
+import re
 from typing import Callable, Optional
 
 from ..models import Flag, Severity, VerificationState
@@ -22,18 +23,36 @@ NUMERIC_TOLERANCE = 0.01  # absolute; tighten/units-aware later
 
 # ---- helpers ---------------------------------------------------------------
 
+class SpecParseError(ValueError):
+    """Raised when a specification string is not in a recognized format."""
+
+
+_NUM = r"(\d+(?:\.\d+)?)"
+_UNIT = r"\s*(?:%|[A-Za-z/%µ\.\s]*)?"
+_RANGE_RE = re.compile(rf"^{_NUM}\s*(?:-|–|—|−|TO)\s*{_NUM}{_UNIT}$")
+_UPPER_RE = re.compile(rf"^(?:NMT|<=|≤|<)\s*{_NUM}{_UNIT}$")
+_LOWER_RE = re.compile(rf"^(?:NLT|>=|≥|>)\s*{_NUM}{_UNIT}$")
+
+
 def parse_spec_limit(spec: str) -> tuple[Optional[float], Optional[float]]:
     """Return (low, high). None means unbounded on that side.
-    Handles 'low-high', 'NMT x' (not more than), 'NLT x' (not less than)."""
-    s = spec.strip().upper()
-    if s.startswith("NMT"):
-        return None, float(s.split()[1])
-    if s.startswith("NLT"):
-        return float(s.split()[1]), None
-    if "-" in s:
-        lo, hi = s.split("-", 1)
-        return float(lo), float(hi)
-    return None, None
+
+    Handles 'low-high' (hyphen/en dash/'to'), 'NMT x' / '<= x' (upper bound) and
+    'NLT x' / '>= x' (lower bound), with optional trailing unit. Anything else
+    raises SpecParseError: an unrecognized spec must never silently pass.
+    """
+    s = (spec or "").strip().upper()
+    if m := _RANGE_RE.match(s):
+        lo, hi = float(m.group(1)), float(m.group(2))
+        if lo > hi:
+            raise SpecParseError(f"inverted range in spec {spec!r}")
+        return lo, hi
+    if m := _UPPER_RE.match(s):
+        return None, float(m.group(1))
+    if m := _LOWER_RE.match(s):
+        return float(m.group(1)), None
+    raise SpecParseError(f"unrecognized specification format: {spec!r}")
+
 
 def evaluate_against_spec(value, qualifier, result_text, low, high):
     """Verdict for a reported result vs a spec: 'pass' | 'violation' | 'indeterminate'.
@@ -143,7 +162,19 @@ def check_spec_vs_result(state: VerificationState) -> VerificationState:
             continue
         if c.quantitative_value is None and c.result_text is None:
             continue
-        low, high = parse_spec_limit(sf.spec_limit)
+        try:
+            low, high = parse_spec_limit(sf.spec_limit)
+        except SpecParseError as exc:
+            flags.append(Flag(
+                check_name="spec_vs_result",
+                severity=Severity.MAJOR,
+                message=f"{c.analyte} ({c.batch_id}): cannot evaluate specification ({exc})",
+                dossier_ref=c.ctd_section,
+                source_ref=sf.source_ref,
+                confidence=0.9,
+                rationale="Specification could not be parsed; conformance is indeterminate.",
+            ))
+            continue
         verdict = evaluate_against_spec(c.quantitative_value, c.qualifier, c.result_text, low, high)
         if verdict == "pass":
             continue

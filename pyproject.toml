@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cmc-verifier"
+version = "0.5.0"
+description = "Multi-agent verification of CMC dossier claims against source CoA/spec data"
+requires-python = ">=3.10"
+dependencies = [
+    "langgraph>=0.2",
+    "langchain-core>=0.3",
+    "pydantic>=2",
+    "pdfplumber>=0.11",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "reportlab>=4", "ruff>=0.5"]
+
+[tool.setuptools.packages.find]
+include = ["cmc_verifier*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

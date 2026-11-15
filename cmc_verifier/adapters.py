@@ -30,8 +30,22 @@ _REQUIRED_HEADERS = {"test", "result"}
 _BATCH_KEYS = {"batch no.", "batch no", "batch id", "batch"}
 _DATE_KEYS = {"date of manufacture", "date"}
 
-_NUM_RE = re.compile(r"-?\d+(?:\.\d+)?")
-_QUALIFIERS = ("<=", ">=", "<", ">")   # match 2-char operators first
+# Optional sign; thousands-grouped (1,234.5), plain, or decimal-comma (0,5); optional exponent.
+_NUM_RE = re.compile(r"-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:[.,]\d+)?(?:[eE][-+]?\d+)?")
+_QUALIFIERS = ("<=", ">=", "≤", "≥", "<", ">")   # match 2-char operators first
+_QUALIFIER_NORMAL = {"≤": "<=", "≥": ">="}
+# Below-quantitation results: kept as a qualitative token instead of being dropped.
+_BLQ_RE = re.compile(r"^(?:<\s*LOQ|<\s*LOD|BLQ|BQL|BELOW\s+LOQ)$", re.I)
+
+
+def _to_float(token: str) -> float:
+    """'1,234.5' -> 1234.5 ; '1,234' -> 1234.0 ; '0,5' -> 0.5 ; '1.2e-3' -> 0.0012."""
+    if re.fullmatch(r"-?\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][-+]?\d+)?", token):
+        token = token.replace(",", "")       # thousands separators
+    else:
+        token = token.replace(",", ".")      # decimal comma
+    return float(token)
+
 
 # Non-numeric qualitative results, normalized (dots/spaces removed) -> canonical.
 _NON_NUMERIC = {"ND": "ND", "N/D": "ND", "NOTDETECTED": "ND", "NONEDETECTED": "ND"}
@@ -71,18 +85,24 @@ def parse_measurement(raw: str) -> tuple[str | None, float | None, str | None, s
     if norm in _NON_NUMERIC:
         return (None, None, None, _NON_NUMERIC[norm])
 
+    if _BLQ_RE.match(s):
+        return (None, None, None, "BLQ")
+
     qualifier = None
     for q in _QUALIFIERS:
         if s.startswith(q):
-            qualifier = q
+            qualifier = _QUALIFIER_NORMAL.get(q, q)
             s = s[len(q):].strip()
             break
 
     m = _NUM_RE.search(s)
     if not m:
         return (None, None, None, None)
-    value = float(m.group())
-    unit = s[m.end():].strip() or None
+    rest = s[m.end():].strip()
+    if re.match(r"^(?:-|–|to)\s*\d", rest, re.I):   # "95-105": a range, not a value
+        return (None, None, None, None)
+    value = _to_float(m.group())
+    unit = rest or None
     return (qualifier, value, unit, None)
 
 

@@ -8,3 +8,5 @@ venv/
 /report.html
 
 /audit_log.jsonl
+.claude/settings.local.json
+graphify-out/

@@ -55,7 +55,7 @@ pytest -q
 
 ## Architecture
 
-A LangGraph state graph: a shared ingestion/normalization spine, a parallel fan-out of check agents, a critic that assigns severity and confidence, and a human-in-the-loop review step.
+A LangGraph state graph: a shared ingestion/normalization spine, a parallel fan-out of check agents, a critic that dedupes and tallies flags by severity, and a human-in-the-loop review step.
 
 ```
 START → ingest → extract_claims → ground
@@ -70,7 +70,7 @@ The design deliberately separates **extraction** (get rows-and-cells out of a do
 
 - **Flag, never decide.** The system surfaces discrepancies with evidence; a qualified human adjudicates. Low model influence keeps it cheap for a regulated buyer to validate.
 - **No ungrounded claim.** Every fact and flag carries a source pointer, enforced in code.
-- **Reproducible by construction.** Deterministic checks in code; the LLM-facing pieces are structured and low-temperature.
+- **Reproducible by construction.** Deterministic checks in code; the pipeline is currently fully deterministic (LLM-based extraction is on the roadmap).
 - **Eval-driven.** A golden dataset with injected errors and answer keys measures both extraction accuracy and check accuracy — every capability ships with its own proof.
 
 ## Testing
@@ -79,7 +79,7 @@ The design deliberately separates **extraction** (get rows-and-cells out of a do
 pytest -q
 ```
 
-**34 tests**, covering the graph end-to-end, per-check verdict truth tables, and extraction accuracy. Extraction runs at **1.0 precision/recall** against the golden CoA fixtures (CSV, bordered PDF, and borderless PDF), and the graph asserts the exact set of 9 known discrepancies with no false positives on the clean claims.
+**39 tests**, covering the graph end-to-end, per-check verdict truth tables, and extraction accuracy. Extraction runs at **1.0 precision/recall** against the golden CoA fixtures (CSV, bordered PDF, and borderless PDF), and the graph asserts the exact set of 9 known discrepancies with no false positives on the clean claims.
 
 ## Tech
 

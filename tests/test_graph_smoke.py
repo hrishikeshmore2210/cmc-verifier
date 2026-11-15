@@ -2,7 +2,7 @@
 
 Runs the pipeline on the Phase 0 golden dataset and asserts the known injected
 errors are caught. Each new golden case you add becomes another assertion here.
-The answer key lives in data/sample/EXPECTED.md.
+The answer keys live in data/sample/sources/*.expected.json.
 """
 
 from pathlib import Path
