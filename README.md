@@ -79,7 +79,7 @@ The design deliberately separates **extraction** (get rows-and-cells out of a do
 pytest -q
 ```
 
-**39 tests**, covering the graph end-to-end, per-check verdict truth tables, and extraction accuracy. Extraction runs at **1.0 precision/recall** against the golden CoA fixtures (CSV, bordered PDF, and borderless PDF), and the graph asserts the exact set of 9 known discrepancies with no false positives on the clean claims.
+**85 tests**, covering the graph end-to-end, per-check verdict truth tables, and extraction accuracy. Extraction runs at **1.0 precision/recall** against the golden CoA fixtures (CSV, bordered PDF, and borderless PDF), and the graph asserts the exact set of 9 known discrepancies with no false positives on the clean claims.
 
 ## Tech
 

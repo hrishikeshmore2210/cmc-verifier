@@ -27,8 +27,12 @@ def _run():
 
 
 def test_expected_flag_count():
+    # 9 injected discrepancies + 4 completeness notes (fixture batches B-003/4/7/8
+    # have source results but no dossier claims).
     final = _run()
-    assert final["report"]["total_flags"] == 9
+    assert final["report"]["total_flags"] == 13
+    injected = [f for f in final["adjudicated_flags"] if f.check_name != "completeness_ctd"]
+    assert len(injected) == 9
 
 
 def test_check_flag_counts():
@@ -38,6 +42,8 @@ def test_check_flag_counts():
     assert by_check.get("spec_vs_result") == 3
     assert by_check.get("traceability") == 1
     assert by_check.get("cross_section_consistency") == 1
+    assert by_check.get("completeness_ctd") == 4
+    assert by_check.get("unit_nomenclature") is None
 
 
 def test_no_false_positive_on_clean_claims():

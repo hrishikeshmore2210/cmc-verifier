@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import operator
 from enum import Enum
-from typing import Annotated, Any, Optional, TypedDict
+from typing import Literal, Annotated, Any, Optional, TypedDict
 
 from pydantic import BaseModel, Field
 
@@ -35,7 +35,7 @@ class SourceFact(BaseModel):
     analyte: Optional[str] = None
     method: Optional[str] = None
     result: Optional[float] = None
-    qualifier: Optional[str] = None        # "<", ">", "<=", ">=" for limit results
+    qualifier: Optional[Literal["<", ">", "<=", ">="]] = None   # for limit results
     result_text: Optional[str] = None      # non-numeric result, e.g. "ND" (not detected)
     unit: Optional[str] = None
     spec_limit: Optional[str] = None
@@ -48,11 +48,11 @@ class Claim(BaseModel):
     """An atomic, checkable assertion parsed from the dossier narrative."""
     text_span: str
     ctd_section: str                       # e.g. "3.2.P.5.1"
-    claim_type: str                        # e.g. "quantitative", "descriptive"
+    claim_type: Literal["quantitative", "descriptive"]
     analyte: Optional[str] = None          # matching key for grounding
     batch_id: Optional[str] = None         # matching key for grounding
     quantitative_value: Optional[float] = None
-    qualifier: Optional[str] = None        # "<", ">", "<=", ">=" carried from the dossier
+    qualifier: Optional[Literal["<", ">", "<=", ">="]] = None   # carried from the dossier
     result_text: Optional[str] = None      # non-numeric claim, e.g. "ND"
     linked_source_ref: Optional[SourceRef] = None   # None => ungrounded (flag it)
 

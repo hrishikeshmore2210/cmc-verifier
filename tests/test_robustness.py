@@ -47,3 +47,30 @@ def test_source_out_of_spec_masked_by_claim(tmp_path):
          "source_ref": {"document_id": "s", "page": 1, "location": "r1"}}]), encoding="utf-8")
     out = build_graph().invoke({"dossier_path": str(dossier), "source_paths": [str(src)]})
     assert any("source result" in f.message and "violates" in f.message for f in out["adjudicated_flags"])
+
+
+def _link(claim_kw=None, result_unit="%", spec_unit="%"):
+    from cmc_verifier.models import Claim, SourceFact, SourceRef
+    ref = SourceRef(document_id="d")
+    c = Claim(text_span="x", ctd_section="3.2.P.5.1", claim_type="quantitative",
+              analyte="Water", batch_id="B1", quantitative_value=1.0)
+    rf = SourceFact(analyte="Water Content", result=1.0, unit=result_unit, batch_id="B1", source_ref=ref)
+    sf = SourceFact(analyte="Water Content", spec_limit="NMT 4.0", unit=spec_unit, source_ref=ref)
+    return {"links": [{"claim": c, "result_fact": rf, "spec_fact": sf}]}
+
+
+def test_unit_mismatch_and_nonstandard_name_flagged():
+    out = checks.check_unit_nomenclature(_link(result_unit="mg/g", spec_unit="%"))
+    msgs = [f.message for f in out["flags"]]
+    assert any("differs from specification unit" in m for m in msgs)
+    assert any("Non-standard analyte name" in m for m in msgs)
+
+
+def test_matching_units_clean():
+    out = checks.check_unit_nomenclature(_link())
+    assert not any("differs" in f.message for f in out["flags"])
+
+
+def test_missing_required_section_flagged():
+    out = checks.check_completeness_ctd({"claims": [], "source_facts": []})
+    assert {f.dossier_ref for f in out["flags"]} == set(checks.REQUIRED_CTD_SECTIONS)

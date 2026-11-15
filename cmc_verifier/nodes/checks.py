@@ -283,6 +283,80 @@ def check_cross_section_consistency(state: VerificationState) -> VerificationSta
 
 # ---- not-yet-implemented checks -------------------------------------------
 
+
+def _norm_unit(u):
+    return None if u is None else u.strip().lower().replace(" ", "").replace("%w/w", "%").replace("%w/v", "%")
+
+
+def check_unit_nomenclature(state: VerificationState) -> VerificationState:
+    """Unit agreement between a result and its spec, and controlled-vocabulary analyte names."""
+    print("[check:unit_nomenclature] running")
+    from ..adapters import canonical_analyte
+    flags: list[Flag] = []
+    for link in state.get("links", []):
+        c, rf, sf = link["claim"], link["result_fact"], link["spec_fact"]
+        if c.analyte and canonical_analyte(c.analyte) != c.analyte.strip():
+            flags.append(Flag(
+                check_name="unit_nomenclature",
+                severity=Severity.MINOR,
+                message=f"Non-standard analyte name '{c.analyte}' (standard: '{canonical_analyte(c.analyte)}')",
+                dossier_ref=c.ctd_section,
+                confidence=0.8,
+                rationale="Dossier analyte name differs from the controlled vocabulary.",
+            ))
+        if rf and sf and rf.unit and sf.unit and _norm_unit(rf.unit) != _norm_unit(sf.unit):
+            flags.append(Flag(
+                check_name="unit_nomenclature",
+                severity=Severity.MAJOR,
+                message=f"{c.analyte} ({c.batch_id}): result unit '{rf.unit}' differs from specification unit '{sf.unit}'",
+                dossier_ref=c.ctd_section,
+                source_ref=rf.source_ref,
+                confidence=0.9,
+                rationale="Comparing values in different units is invalid without conversion.",
+            ))
+    return {"flags": flags}
+
+
+# CTD sections a Module 3 drug-product quality summary is expected to cover.
+REQUIRED_CTD_SECTIONS = ("3.2.P.5.1", "3.2.P.5.4")
+
+
+def check_completeness_ctd(state: VerificationState) -> VerificationState:
+    """Required sections present, and every batch with source results is reported."""
+    print("[check:completeness_ctd] running")
+    flags: list[Flag] = []
+    claims = state.get("claims", [])
+    present = {c.ctd_section for c in claims}
+    for section in REQUIRED_CTD_SECTIONS:
+        if section not in present:
+            flags.append(Flag(
+                check_name="completeness_ctd",
+                severity=Severity.MAJOR,
+                message=f"Required CTD section {section} has no claims in the dossier",
+                dossier_ref=section,
+                confidence=0.9,
+                rationale="A required section appears to be missing or empty.",
+            ))
+    import re as _re
+    key = lambda b: _re.sub(r"[^a-z0-9]", "", b.lower()) if b else None
+    claimed = {key(c.batch_id) for c in claims}
+    reported = set()
+    for f in state.get("source_facts", []):
+        k = key(f.batch_id)
+        if f.result is None and f.result_text is None or k is None or k in claimed or k in reported:
+            continue
+        reported.add(k)
+        flags.append(Flag(
+            check_name="completeness_ctd",
+            severity=Severity.MINOR,
+            message=f"Batch {f.batch_id} has source results but no dossier claims",
+            source_ref=f.source_ref,
+            confidence=0.7,
+            rationale="Source data exists for a batch the dossier does not report.",
+        ))
+    return {"flags": flags}
+
+
 def _noop(check_name: str) -> Callable[[VerificationState], VerificationState]:
     def _check(state: VerificationState) -> VerificationState:
         print(f"[check:{check_name}] running (stub)")
@@ -297,7 +371,7 @@ CHECKS: dict[str, Callable[[VerificationState], VerificationState]] = {
     "spec_vs_result": check_spec_vs_result,
     "traceability": check_traceability,
     "cross_section_consistency": check_cross_section_consistency,
-    "unit_nomenclature": _noop("unit_nomenclature"),
-    "completeness_ctd": _noop("completeness_ctd"),
+    "unit_nomenclature": check_unit_nomenclature,
+    "completeness_ctd": check_completeness_ctd,
     "stability_trend": _noop("stability_trend"),
 }
