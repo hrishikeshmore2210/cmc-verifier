@@ -20,6 +20,7 @@ from .nodes.extract_claims import extract_claims
 from .nodes.ground import ground
 from .nodes.ingest import ingest
 from .nodes.review import human_review
+from .nodes.safety import isolate
 
 
 def build_graph():
@@ -32,7 +33,7 @@ def build_graph():
 
     # parallel checks
     for name, fn in CHECKS.items():
-        g.add_node(name, fn)
+        g.add_node(name, isolate(name, fn))
 
     # critic + human-in-the-loop
     g.add_node("critic", critic)

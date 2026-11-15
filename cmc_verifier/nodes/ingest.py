@@ -12,14 +12,14 @@ import json
 from pathlib import Path
 
 from ..adapters import parse_coa_csv, parse_coa_pdf
-from ..models import SourceFact, VerificationState
+from ..models import Flag, Severity, SourceFact, VerificationState
 
 
 def _parse_json(path: Path) -> list[SourceFact]:
-    return [SourceFact(**row) for row in json.loads(path.read_text())]
+    return [SourceFact(**row) for row in json.loads(path.read_text(encoding="utf-8-sig"))]
 
 
-# Extension -> adapter. Add ".pdf": parse_coa_pdf here later.
+# Extension -> adapter.
 ADAPTERS = {
     ".csv": parse_coa_csv,
     ".json": _parse_json,
@@ -27,9 +27,20 @@ ADAPTERS = {
 }
 
 
+def _ingest_flag(path: Path, problem: str) -> Flag:
+    return Flag(
+        check_name="ingest",
+        severity=Severity.MAJOR,
+        message=f"Source document '{path.name}' {problem}",
+        confidence=1.0,
+        rationale="Claims relying on this document cannot be verified; do not treat as clean.",
+    )
+
+
 def ingest(state: VerificationState) -> VerificationState:
     facts: list[SourceFact] = []
     skipped: list[str] = []
+    flags: list[Flag] = []
 
     for p in state.get("source_paths", []):
         path = Path(p)
@@ -37,11 +48,18 @@ def ingest(state: VerificationState) -> VerificationState:
         if adapter is None:
             skipped.append(path.name)
             continue
-        parsed = adapter(path)
+        try:
+            parsed = adapter(path)
+        except Exception as exc:  # noqa: BLE001 - one bad file must not sink the run
+            print(f"[ingest]   FAILED {path.name}: {type(exc).__name__}: {exc}")
+            flags.append(_ingest_flag(path, f"could not be parsed ({type(exc).__name__}: {exc})"))
+            continue
+        if not parsed:
+            flags.append(_ingest_flag(path, "yielded no facts (empty, unrecognized layout, or scanned image)"))
         facts.extend(parsed)
         print(f"[ingest]   {path.name}: {len(parsed)} fact(s) via {path.suffix} adapter")
 
     if skipped:
         print(f"[ingest]   skipped (no adapter): {', '.join(skipped)}")
     print(f"[ingest] loaded {len(facts)} source fact(s) total")
-    return {"source_facts": facts}
+    return {"source_facts": facts, "flags": flags}

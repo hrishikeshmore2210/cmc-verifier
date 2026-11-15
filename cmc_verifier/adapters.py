@@ -27,6 +27,7 @@ from pathlib import Path
 from .models import SourceFact, SourceRef
 
 _REQUIRED_HEADERS = {"test", "result"}
+_PAGE_MARKER = "\x00page"   # synthetic row emitted by paged adapters (PDF)
 _BATCH_KEYS = {"batch no.", "batch no", "batch id", "batch"}
 _DATE_KEYS = {"date of manufacture", "date"}
 
@@ -121,12 +122,15 @@ def facts_from_rows(rows, document_id):
     XLSX, or a vision model. Do not duplicate this in an adapter.
     """
     batch_id = date = header = None
+    page = 1
     facts = []
     for line_no, row in enumerate(rows, start=1):
         cells = [_clean(c) for c in row]
         if not any(cells):
             continue
         key = cells[0].lower()
+        if key == _PAGE_MARKER and len(cells) > 1 and cells[1].isdigit():
+            page = int(cells[1]); continue
         if key in _BATCH_KEYS and len(cells) > 1 and cells[1]:
             batch_id = cells[1]; continue
         if header is None and key in _DATE_KEYS and len(cells) > 1 and cells[1]:
@@ -148,7 +152,7 @@ def facts_from_rows(rows, document_id):
             result=value, qualifier=qualifier, result_text=result_text,
             unit=None if result_text else (unit_from_value or record.get("units") or None),
             batch_id=batch_id, date=date,
-            source_ref=SourceRef(document_id=document_id, page=1, location=f"row {line_no}"),
+            source_ref=SourceRef(document_id=document_id, page=page, location=f"row {line_no}"),
         ))
     return facts
 
@@ -156,7 +160,7 @@ def facts_from_rows(rows, document_id):
 def parse_coa_csv(path):
     """CSV adapter: read the file into rows, hand them to the shared normalizer."""
     path = Path(path)
-    rows = list(csv.reader(io.StringIO(path.read_text())))
+    rows = list(csv.reader(io.StringIO(path.read_text(encoding="utf-8-sig"), newline="")))
     return facts_from_rows(rows, document_id=path.stem)
 
 _TEXT_TABLE_SETTINGS = {"vertical_strategy": "text", "horizontal_strategy": "text"}
@@ -203,10 +207,11 @@ def parse_coa_pdf(path):
     path = Path(path)
     rows = []
     with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
+        for page_no, page in enumerate(pdf.pages, start=1):
+            rows.append([_PAGE_MARKER, str(page_no)])
             text = page.extract_text() or ""
             for line in text.splitlines():
-                mb = re.search(r"Batch No\.?\s*:?\s*([A-Za-z0-9\-]+)", line, re.I)
+                mb = re.search(r"Batch No\.?\s*:?\s*([A-Za-z0-9_/\-]+)", line, re.I)
                 if mb:
                     rows.append(["Batch No.", mb.group(1)])
                 md = re.search(r"Date of Manufacture\s*:?\s*(.+)", line, re.I)

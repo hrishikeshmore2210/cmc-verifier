@@ -153,6 +153,34 @@ def check_numerical_reconciliation(state: VerificationState) -> VerificationStat
     return {"flags": flags}
 
 
+def _flag_source_masked_by_claim(flags, claim, result_fact, spec_fact, low, high, claim_verdict):
+    """Independently evaluate the SOURCE result against the spec.
+
+    If the source value violates the spec but the dossier claim does not, the claim
+    is hiding an out-of-spec result. (When the claim also violates, the claim-level
+    flag already covers it.)
+    """
+    if result_fact is None or claim_verdict == "violation":
+        return
+    if result_fact.result is None and result_fact.result_text is None:
+        return
+    src_verdict = evaluate_against_spec(
+        result_fact.result, result_fact.qualifier, result_fact.result_text, low, high)
+    if src_verdict != "violation":
+        return
+    reported = result_fact.result_text or f"{result_fact.qualifier or ''}{result_fact.result}{result_fact.unit or ''}"
+    flags.append(Flag(
+        check_name="spec_vs_result",
+        severity=Severity.CRITICAL,
+        message=(f"{claim.analyte} ({claim.batch_id}): source result {reported} violates "
+                 f"specification '{spec_fact.spec_limit}' (dossier claim does not reflect this)"),
+        dossier_ref=claim.ctd_section,
+        source_ref=result_fact.source_ref,
+        confidence=0.95,
+        rationale="Source of record is out of specification; the dossier claim masks it.",
+    ))
+
+
 def check_spec_vs_result(state: VerificationState) -> VerificationState:
     print("[check:spec_vs_result] running")
     flags: list[Flag] = []
@@ -176,6 +204,7 @@ def check_spec_vs_result(state: VerificationState) -> VerificationState:
             ))
             continue
         verdict = evaluate_against_spec(c.quantitative_value, c.qualifier, c.result_text, low, high)
+        _flag_source_masked_by_claim(flags, c, link["result_fact"], sf, low, high, verdict)
         if verdict == "pass":
             continue
         reported = c.result_text or f"{c.qualifier or ''}{c.quantitative_value}{sf.unit or ''}"
